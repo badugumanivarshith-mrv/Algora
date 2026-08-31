@@ -10,6 +10,9 @@ import { MainLayout } from './components/layout/main-layout';
 import { DashboardHome } from './features/dashboard/dashboard-home';
 import { ProfileDashboard } from './features/profile/profile-dashboard';
 import { AccountSettings } from './features/profile/account-settings';
+import { ProblemsList } from './features/problems/problems-list';
+import { ProblemWorkspace } from './features/problems/problem-workspace';
+import { SubmissionsList } from './features/problems/submissions-list';
 
 export default function App() {
   return (
@@ -118,6 +121,18 @@ function AppContent() {
     <MainLayout user={user} currentPath={path} onNavigate={navigate} onLogout={handleLogout}>
       {(path === '/' || path === '/dashboard') && (
         <DashboardHome user={user} onNavigate={navigate} />
+      )}
+
+      {path === '/problems' && (
+        <ProblemsList onNavigate={navigate} />
+      )}
+
+      {path.startsWith('/problems/') && (
+        <ProblemWorkspace slug={path.replace('/problems/', '')} onNavigate={navigate} />
+      )}
+
+      {path === '/submissions' && (
+        <SubmissionsList onNavigate={navigate} />
       )}
 
       {path === '/profile' && (

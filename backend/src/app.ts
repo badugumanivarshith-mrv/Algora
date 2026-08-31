@@ -3,6 +3,9 @@ import cors from 'cors';
 import healthRouter from './modules/health/health.routes';
 import authRouter from './modules/auth/auth.routes';
 import profileRouter from './modules/profile/profile.routes';
+import problemsRouter from './modules/problems/problem.routes';
+import submissionsRouter from './modules/submissions/submission.routes';
+import { problemController } from './modules/problems/problem.controller';
 
 import { env } from './config/env';
 
@@ -15,6 +18,9 @@ app.use(express.json());
 app.use('/api/health', healthRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/profile', profileRouter);
+app.use('/api/problems', problemsRouter);
+app.use('/api/submissions', submissionsRouter);
+app.get('/api/tags', problemController.getTags);
 
 app.get('/api/system/email-status', (req, res) => {
   const provider = env.EMAIL_PROVIDER;

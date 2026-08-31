@@ -1,9 +1,16 @@
 import app from './app';
 import { env } from './config/env';
+import { seedDatabase } from './db/seed';
 
-const server = app.listen(env.PORT, () => {
+const server = app.listen(env.PORT, async () => {
   console.log(`🚀 Server running in ${env.NODE_ENV} mode on port ${env.PORT}`);
   console.log(`🔗 Health check available at http://localhost:${env.PORT}/api/health`);
+  
+  try {
+    await seedDatabase();
+  } catch (err) {
+    console.error('Failed to seed database:', err);
+  }
 });
 
 // Handle graceful shutdown signals
