@@ -59,7 +59,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ user, onNavigate }
           </div>
           <div className="pt-2">
             <button
-              onClick={() => onNavigate('/profile')}
+              onClick={() => onNavigate('/settings')}
               className="text-xs text-indigo-600 dark:text-indigo-400 font-bold hover:underline cursor-pointer"
             >
               Update password →

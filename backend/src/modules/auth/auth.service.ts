@@ -166,5 +166,14 @@ export class AuthService {
       .returning();
     return updatedUser;
   }
+
+  async updateLastLogin(userId: number): Promise<void> {
+    await db
+      .update(users)
+      .set({
+        lastLoginAt: new Date(),
+      })
+      .where(eq(users.id, userId));
+  }
 }
 export const authService = new AuthService();

@@ -5,12 +5,11 @@ import { Register } from './features/auth/register';
 import { VerifyEmail } from './features/auth/verify-email';
 import { ForgotPassword } from './features/auth/forgot-password';
 import { ResetPassword } from './features/auth/reset-password';
-import { Profile } from './features/auth/profile';
-import { ChangePassword } from './features/auth/change-password';
 import { ThemeProvider } from './features/theme/theme.context';
 import { MainLayout } from './components/layout/main-layout';
 import { DashboardHome } from './features/dashboard/dashboard-home';
-import { SettingsPage } from './features/dashboard/settings-page';
+import { ProfileDashboard } from './features/profile/profile-dashboard';
+import { AccountSettings } from './features/profile/account-settings';
 
 export default function App() {
   return (
@@ -122,22 +121,11 @@ function AppContent() {
       )}
 
       {path === '/profile' && (
-        <div className="space-y-8">
-          <div className="text-left mb-4">
-            <h2 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">Account Profile</h2>
-            <p className="text-slate-500 dark:text-slate-400 text-xs mt-1">
-              Update your account details and password properties.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Profile user={user} onUpdateSuccess={(u) => setUser(u)} onLogout={handleLogout} />
-            <ChangePassword onLogout={handleLogout} />
-          </div>
-        </div>
+        <ProfileDashboard user={user} onUpdateSuccess={(u) => setUser(u)} />
       )}
 
       {path === '/settings' && (
-        <SettingsPage user={user} onNavigate={navigate} />
+        <AccountSettings user={user} />
       )}
     </MainLayout>
   );

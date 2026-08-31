@@ -72,19 +72,28 @@ export const Topbar: React.FC<TopbarProps> = ({ user, onMenuToggle, onNavigate }
           <span className="h-5 w-px bg-slate-200 dark:bg-slate-800"></span>
 
           {/* User info details */}
-          <div className="flex items-center space-x-2.5">
+          <div 
+            onClick={() => onNavigate('/profile')}
+            className="flex items-center space-x-2.5 cursor-pointer hover:opacity-90 active:scale-98 transition-all"
+          >
             {/* Simulated Avatar Widget */}
-            <div className="w-8.5 h-8.5 rounded-full bg-gradient-to-tr from-indigo-550 to-violet-550 flex items-center justify-center shadow-sm">
-              <span className="text-white font-bold text-xs uppercase">
-                {user.username.slice(0, 2)}
-              </span>
-            </div>
+            {user.avatarUrl ? (
+              <div className="w-8.5 h-8.5 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-150">
+                <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+              </div>
+            ) : (
+              <div className="w-8.5 h-8.5 rounded-full bg-gradient-to-tr from-indigo-650 to-violet-650 flex items-center justify-center shadow-sm">
+                <span className="text-white font-bold text-xs uppercase">
+                  {(user.displayName || user.username).slice(0, 2)}
+                </span>
+              </div>
+            )}
             
             <div className="hidden sm:flex flex-col text-left">
-              <span className="text-xs font-bold text-slate-700 dark:text-slate-200 tracking-tight">
-                {user.username}
+              <span className="text-xs font-bold text-slate-755 dark:text-slate-200 tracking-tight">
+                {user.displayName || user.username}
               </span>
-              <span className="text-[10px] text-slate-450 dark:text-slate-500 font-semibold truncate max-w-[120px]">
+              <span className="text-[10px] text-slate-455 dark:text-slate-500 font-semibold truncate max-w-[120px]">
                 {user.email}
               </span>
             </div>

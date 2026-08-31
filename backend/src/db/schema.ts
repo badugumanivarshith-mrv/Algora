@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, boolean, timestamp } from 'drizzle-orm/pg-core';
+import { pgTable, serial, varchar, boolean, timestamp, text } from 'drizzle-orm/pg-core';
 
 export const systemHealth = pgTable('system_health', {
   id: serial('id').primaryKey(),
@@ -18,6 +18,10 @@ export const users = pgTable('users', {
   verificationTokenExpiresAt: timestamp('verification_token_expires_at'),
   resetPasswordToken: varchar('reset_password_token', { length: 256 }),
   resetPasswordTokenExpiresAt: timestamp('reset_password_token_expires_at'),
+  displayName: varchar('display_name', { length: 100 }),
+  bio: text('bio'),
+  avatarUrl: varchar('avatar_url', { length: 512 }),
+  lastLoginAt: timestamp('last_login_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

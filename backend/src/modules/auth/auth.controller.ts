@@ -170,6 +170,9 @@ export class AuthController {
         return;
       }
 
+      // Update lastLoginAt
+      await authService.updateLastLogin(user.id);
+
       // Generate JWT
       const token = authService.generateJwt(user.id, user.email);
 

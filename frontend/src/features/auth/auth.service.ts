@@ -77,6 +77,10 @@ export interface UserProfile {
   username: string;
   email: string;
   emailVerified: boolean;
+  displayName?: string | null;
+  bio?: string | null;
+  avatarUrl?: string | null;
+  lastLoginAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }
