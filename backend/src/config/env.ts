@@ -14,6 +14,22 @@ const envSchema = z.object({
   EMAIL_PROVIDER: z.enum(['resend', 'mock']).default('mock'),
   RESEND_API_KEY: z.string().optional(),
   EMAIL_FROM: z.string().default('onboarding@resend.dev'),
+}).superRefine((data, ctx) => {
+  if (data.EMAIL_PROVIDER === 'resend') {
+    if (!data.RESEND_API_KEY) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['RESEND_API_KEY'],
+        message: 'RESEND_API_KEY is required when EMAIL_PROVIDER is resend',
+      });
+    } else if (!data.RESEND_API_KEY.startsWith('re_')) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['RESEND_API_KEY'],
+        message: 'RESEND_API_KEY must start with "re_" in production-ready mode',
+      });
+    }
+  }
 });
 
 const parsed = envSchema.safeParse(process.env);

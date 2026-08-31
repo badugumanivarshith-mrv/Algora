@@ -1,20 +1,35 @@
 import { env } from '../config/env';
 
 export class EmailService {
+  private fallbackToMock = false;
+
+  public resetFallback(): void {
+    this.fallbackToMock = false;
+  }
+
+  public isFallbackActive(): boolean {
+    return this.fallbackToMock;
+  }
+
+  private logMock(to: string, subject: string, html: string, text: string) {
+    console.log('\n----------------------------------------');
+    console.log(`[MOCK EMAIL] To: ${to}`);
+    console.log(`[MOCK EMAIL] Subject: ${subject}`);
+    console.log(`[MOCK EMAIL] HTML Body:\n${html}`);
+    console.log(`[MOCK EMAIL] Text Body:\n${text}`);
+    console.log('----------------------------------------\n');
+  }
+
   private async sendEmail(to: string, subject: string, html: string, text: string): Promise<void> {
-    if (env.EMAIL_PROVIDER === 'mock') {
-      console.log('\n----------------------------------------');
-      console.log(`[MOCK EMAIL] To: ${to}`);
-      console.log(`[MOCK EMAIL] Subject: ${subject}`);
-      console.log(`[MOCK EMAIL] HTML Body:\n${html}`);
-      console.log(`[MOCK EMAIL] Text Body:\n${text}`);
-      console.log('----------------------------------------\n');
+    if (env.EMAIL_PROVIDER === 'mock' || this.fallbackToMock) {
+      this.logMock(to, subject, html, text);
       return;
     }
 
     if (!env.RESEND_API_KEY) {
       console.warn('⚠️ Resend API Key is missing. Falling back to mock logging.');
-      console.log(`[MOCK EMAIL] To: ${to} (Fallback)`);
+      this.fallbackToMock = true;
+      this.logMock(to, subject, html, text);
       return;
     }
 
@@ -33,6 +48,20 @@ export class EmailService {
           text,
         }),
       });
+
+      if (response.status === 401) {
+        console.error('\n❌ [EMAIL SERVICE ERROR] Resend API returned 401 Unauthorized.');
+        console.error(`Diagnostics:`);
+        console.error(`- Current Provider: ${env.EMAIL_PROVIDER}`);
+        console.error(`- Sender: ${env.EMAIL_FROM}`);
+        console.error(`- API Key Prefix: ${env.RESEND_API_KEY.slice(0, 3)}...`);
+        console.error(`- API Key Length: ${env.RESEND_API_KEY.length} characters`);
+        console.error(`- Action: Automatically switching to mock email mode for this session.\n`);
+
+        this.fallbackToMock = true;
+        this.logMock(to, subject, html, text);
+        return;
+      }
 
       if (!response.ok) {
         const errorText = await response.text();
