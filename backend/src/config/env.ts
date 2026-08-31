@@ -11,6 +11,9 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   JWT_SECRET: z.string().default('dev_secret_key_for_algora_ai_change_in_production'),
   FRONTEND_URL: z.string().url().default('http://localhost:5173'),
+  EMAIL_PROVIDER: z.enum(['resend', 'mock']).default('mock'),
+  RESEND_API_KEY: z.string().optional(),
+  EMAIL_FROM: z.string().default('onboarding@resend.dev'),
 });
 
 const parsed = envSchema.safeParse(process.env);

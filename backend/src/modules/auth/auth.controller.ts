@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { env } from '../../config/env';
 import { authService } from './auth.service';
+import { emailService } from '../../services/email.service';
 import {
   registerSchema,
   loginSchema,
@@ -51,12 +51,8 @@ export class AuthController {
         verificationTokenExpiresAt,
       });
 
-      // Log mock email verification link to backend console
-      const verifyLink = `${env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
-      console.log('\n----------------------------------------');
-      console.log(`[MOCK EMAIL] Verification email sent to: ${email}`);
-      console.log(`[MOCK EMAIL] Click here to verify: ${verifyLink}`);
-      console.log('----------------------------------------\n');
+      // Send verification email via EmailService
+      await emailService.sendVerificationEmail(email, verificationToken);
 
       res.status(201).json({
         message: 'Registration successful. Please check your email console logs to verify your account.',
@@ -124,12 +120,8 @@ export class AuthController {
 
       await authService.setVerificationToken(user.id, verificationToken, verificationTokenExpiresAt);
 
-      // Log mock email
-      const verifyLink = `${env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
-      console.log('\n----------------------------------------');
-      console.log(`[MOCK EMAIL] Verification email resent to: ${email}`);
-      console.log(`[MOCK EMAIL] Click here to verify: ${verifyLink}`);
-      console.log('----------------------------------------\n');
+      // Send verification email via EmailService
+      await emailService.sendVerificationEmail(email, verificationToken);
 
       res.json({ message: 'Verification link resent. Please check your email console logs.' });
     } catch (error) {
@@ -216,12 +208,8 @@ export class AuthController {
 
         await authService.setResetPasswordToken(user.id, resetToken, resetTokenExpiresAt);
 
-        // Log mock email
-        const resetLink = `${env.FRONTEND_URL}/reset-password?token=${resetToken}`;
-        console.log('\n----------------------------------------');
-        console.log(`[MOCK EMAIL] Password reset email sent to: ${email}`);
-        console.log(`[MOCK EMAIL] Click here to reset: ${resetLink}`);
-        console.log('----------------------------------------\n');
+        // Send reset email via EmailService
+        await emailService.sendPasswordResetEmail(email, resetToken);
       }
 
       res.json({
@@ -368,12 +356,8 @@ export class AuthController {
         updates.verificationToken = verificationToken;
         updates.verificationTokenExpiresAt = verificationTokenExpiresAt;
 
-        // Log mock email
-        const verifyLink = `${env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
-        console.log('\n----------------------------------------');
-        console.log(`[MOCK EMAIL] Email update requested. Verification email sent to: ${email}`);
-        console.log(`[MOCK EMAIL] Click here to verify: ${verifyLink}`);
-        console.log('----------------------------------------\n');
+        // Send verification email via EmailService
+        await emailService.sendEmailChangeVerification(email, verificationToken);
       }
 
       if (Object.keys(updates).length === 0) {

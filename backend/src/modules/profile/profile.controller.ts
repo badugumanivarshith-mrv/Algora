@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { profileService } from './profile.service';
 import { authService } from '../auth/auth.service';
 import { updateProfileSchema, avatarSchema, changePasswordSchema } from './profile.validation';
-import { env } from '../../config/env';
+import { emailService } from '../../services/email.service';
 import { users } from '../../db/schema';
 
 export class ProfileController {
@@ -81,12 +81,8 @@ export class ProfileController {
         updates.verificationToken = verificationToken;
         updates.verificationTokenExpiresAt = verificationTokenExpiresAt;
 
-        // Log mock email
-        const verifyLink = `${env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
-        console.log('\n----------------------------------------');
-        console.log(`[MOCK EMAIL] Email update requested. Verification email sent to: ${email}`);
-        console.log(`[MOCK EMAIL] Click here to verify: ${verifyLink}`);
-        console.log('----------------------------------------\n');
+        // Send verification email via EmailService
+        await emailService.sendEmailChangeVerification(email, verificationToken);
       }
 
       if (Object.keys(updates).length === 0) {
