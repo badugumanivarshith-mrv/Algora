@@ -65,10 +65,10 @@ function AppContent() {
 
   if (checkingSession) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center text-slate-400 font-sans transition-colors duration-200">
+      <div className="min-h-screen bg-transparent flex items-center justify-center text-slate-400 font-sans transition-colors duration-200">
         <div className="flex flex-col items-center space-y-4">
           <span className="w-10 h-10 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></span>
-          <p className="text-sm font-semibold tracking-wider text-slate-500 dark:text-slate-400">Loading Algora AI...</p>
+          <p className="text-sm font-semibold tracking-wider text-slate-505 dark:text-slate-400">Loading Algora AI...</p>
         </div>
       </div>
     );
@@ -91,7 +91,7 @@ function AppContent() {
   // 1. Unauthenticated View Pages Layout
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-100 via-slate-50 to-slate-200 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950 text-slate-800 dark:text-slate-100 flex flex-col justify-center items-center px-6 py-12 font-sans antialiased selection:bg-indigo-500 selection:text-white transition-colors duration-200">
+      <div className="min-h-screen bg-transparent text-slate-800 dark:text-slate-100 flex flex-col justify-center items-center px-6 py-12 font-sans antialiased selection:bg-indigo-500 selection:text-white transition-colors duration-200">
         <div className="w-full flex justify-center">
           {path === '/login' && (
             <Login onNavigate={navigate} onLoginSuccess={(u) => { setUser(u); navigate('/dashboard'); }} />

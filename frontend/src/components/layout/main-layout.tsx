@@ -39,10 +39,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-200">
+    <div className="min-h-screen flex flex-col bg-transparent text-slate-800 dark:text-slate-100 transition-colors duration-200">
       
       {/* Topbar header bar */}
-      <Topbar user={user} onMenuToggle={() => setDrawerOpen((prev) => !prev)} onNavigate={handleNavigate} />
+      <Topbar user={user} onMenuToggle={() => setDrawerOpen((prev) => !prev)} onNavigate={handleNavigate} onLogout={onLogout} />
 
       {/* Main viewport frame */}
       <div className="flex-1 flex overflow-hidden">

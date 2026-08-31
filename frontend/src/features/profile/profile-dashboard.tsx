@@ -140,42 +140,42 @@ export const ProfileDashboard: React.FC<ProfileDashboardProps> = ({ user, onUpda
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 font-sans antialiased text-slate-900 dark:text-slate-100 transition-colors duration-200">
+    <div className="max-w-7xl mx-auto px-4 py-6 text-slate-900 dark:text-slate-100 transition-colors duration-200">
       {/* Header section */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Profile Workspace</h1>
-        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+      <div className="mb-6">
+        <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">Profile Workspace</h1>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           Manage your personal public info, customize your avatar profile presets, and track platform metrics.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Left Columns - Info & Preset Select Forms */}
-        <div className="lg:col-span-2 space-y-8">
+        <div className="lg:col-span-2 space-y-6">
           
           {/* Main profile form */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden transition-colors duration-200">
-            <div className="px-6 py-5 border-b border-slate-200 dark:border-slate-800">
-              <h3 className="text-lg font-medium leading-6 text-slate-900 dark:text-white">Profile Information</h3>
-              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Update your username, screen name, and bio.</p>
+          <div className="saas-card !p-0 overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-850">
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Profile Information</h3>
+              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-450">Update your username, screen name, and bio.</p>
             </div>
             
-            <form onSubmit={handleProfileSubmit} className="p-6 space-y-6">
+            <form onSubmit={handleProfileSubmit} className="p-6 space-y-4">
               {errorMessage && (
-                <div className="p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 rounded-lg text-sm font-medium">
+                <div className="p-3 bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/30 text-rose-800 dark:text-rose-400 rounded-lg text-xs font-medium">
                   {errorMessage}
                 </div>
               )}
               {successMessage && (
-                <div className="p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900/50 text-green-600 dark:text-green-400 rounded-lg text-sm font-medium">
+                <div className="p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/30 text-emerald-800 dark:text-emerald-400 rounded-lg text-xs font-medium">
                   {successMessage}
                 </div>
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="username" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <label htmlFor="username" className="block text-xs font-semibold text-slate-700 dark:text-slate-350">
                     Username
                   </label>
                   <input
@@ -183,14 +183,14 @@ export const ProfileDashboard: React.FC<ProfileDashboardProps> = ({ user, onUpda
                     id="username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all duration-150"
+                    className="form-input mt-1.5"
                     placeholder="e.g. johndoe"
                     required
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="displayName" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <label htmlFor="displayName" className="block text-xs font-semibold text-slate-700 dark:text-slate-350">
                     Display Name
                   </label>
                   <input
@@ -198,14 +198,14 @@ export const ProfileDashboard: React.FC<ProfileDashboardProps> = ({ user, onUpda
                     id="displayName"
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all duration-150"
+                    className="form-input mt-1.5"
                     placeholder="e.g. John Doe"
                   />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="bio" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                <label htmlFor="bio" className="block text-xs font-semibold text-slate-700 dark:text-slate-350">
                   Bio
                 </label>
                 <textarea
@@ -213,7 +213,7 @@ export const ProfileDashboard: React.FC<ProfileDashboardProps> = ({ user, onUpda
                   rows={4}
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all duration-150"
+                  className="form-input mt-1.5 resize-none"
                   placeholder="Tell other students about yourself..."
                 />
               </div>
@@ -222,7 +222,7 @@ export const ProfileDashboard: React.FC<ProfileDashboardProps> = ({ user, onUpda
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-50 transition-all duration-150 shadow-sm"
+                  className="btn-primary"
                 >
                   {isSubmitting ? 'Saving changes...' : 'Save Profile'}
                 </button>
@@ -231,15 +231,15 @@ export const ProfileDashboard: React.FC<ProfileDashboardProps> = ({ user, onUpda
           </div>
 
           {/* Avatar preset selection card */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden transition-colors duration-200">
-            <div className="px-6 py-5 border-b border-slate-200 dark:border-slate-800">
-              <h3 className="text-lg font-medium leading-6 text-slate-900 dark:text-white">Avatar Workspace</h3>
-              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Choose a preset avatar style or input a custom image URL.</p>
+          <div className="saas-card !p-0 overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-850">
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Avatar Workspace</h3>
+              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-450">Choose a preset avatar style or input a custom image URL.</p>
             </div>
 
             <div className="p-6 space-y-6">
               <div>
-                <span className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+                <span className="block text-xs font-semibold text-slate-750 dark:text-slate-350 mb-3">
                   Preset Avatars
                 </span>
                 <div className="flex flex-wrap gap-4">
@@ -248,9 +248,9 @@ export const ProfileDashboard: React.FC<ProfileDashboardProps> = ({ user, onUpda
                       key={i}
                       type="button"
                       onClick={() => handleAvatarPresetSelect(url)}
-                      className={`relative w-16 h-16 rounded-full overflow-hidden border-2 transition-all duration-150 hover:scale-105 ${
+                      className={`relative w-14 h-14 rounded-full overflow-hidden border-2 transition-all duration-150 hover:scale-105 cursor-pointer ${
                         user.avatarUrl === url
-                          ? 'border-indigo-600 ring-2 ring-indigo-500/20'
+                          ? 'border-indigo-650 ring-2 ring-indigo-500/10'
                           : 'border-slate-200 dark:border-slate-800'
                       }`}
                     >
@@ -260,23 +260,23 @@ export const ProfileDashboard: React.FC<ProfileDashboardProps> = ({ user, onUpda
                 </div>
               </div>
 
-              <form onSubmit={handleAvatarUrlSubmit} className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+              <form onSubmit={handleAvatarUrlSubmit} className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-850">
                 <div>
-                  <label htmlFor="avatarUrl" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <label htmlFor="avatarUrl" className="block text-xs font-semibold text-slate-700 dark:text-slate-305">
                     Custom Avatar URL
                   </label>
-                  <div className="mt-1 flex gap-3">
+                  <div className="mt-1.5 flex gap-3">
                     <input
                       type="url"
                       id="avatarUrl"
                       value={avatarUrl}
                       onChange={(e) => setAvatarUrl(e.target.value)}
-                      className="block w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all duration-150"
+                      className="form-input"
                       placeholder="https://example.com/avatar.png"
                     />
                     <button
                       type="submit"
-                      className="px-4 py-2 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-850 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all duration-150"
+                      className="btn-secondary whitespace-nowrap"
                     >
                       Apply
                     </button>
@@ -288,54 +288,54 @@ export const ProfileDashboard: React.FC<ProfileDashboardProps> = ({ user, onUpda
         </div>
 
         {/* Right Columns - Details & Stats */}
-        <div className="space-y-8">
+        <div className="space-y-6">
           
           {/* Avatar & Profile Card */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm p-6 text-center transition-colors duration-200">
+          <div className="saas-card text-center">
             <div className="flex justify-center mb-4">
               {user.avatarUrl ? (
-                <div className="w-24 h-24 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm bg-slate-100 dark:bg-slate-800">
+                <div className="w-20 h-20 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800 shadow-xs bg-slate-100">
                   <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                 </div>
               ) : (
-                <div className="w-24 h-24 rounded-full bg-indigo-500 text-white font-bold flex items-center justify-center text-2xl border border-indigo-400 shadow-sm">
+                <div className="w-20 h-20 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-xl border border-indigo-500 shadow-xs">
                   {getInitials()}
                 </div>
               )}
             </div>
 
-            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+            <h2 className="text-lg font-extrabold text-slate-900 dark:text-white">
               {user.displayName || user.username}
             </h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400">@{user.username}</p>
+            <p className="text-xs text-slate-450 dark:text-slate-500">@{user.username}</p>
             {user.bio && (
-              <p className="mt-4 text-sm text-slate-600 dark:text-slate-400 italic px-4">
+              <p className="mt-3 text-xs text-slate-600 dark:text-slate-400 italic px-4 leading-relaxed">
                 "{user.bio}"
               </p>
             )}
 
-            <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 text-left space-y-3 text-xs">
+            <div className="mt-6 pt-5 border-t border-slate-150 dark:border-slate-850 text-left space-y-3.5 text-xs">
               <div className="flex justify-between items-center">
-                <span className="text-slate-400">Status</span>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-semibold bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-900/30">
+                <span className="text-slate-400 dark:text-slate-500">Status</span>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-450 border border-green-200 dark:border-green-900/30">
                   Active
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-slate-400">Verification</span>
+                <span className="text-slate-400 dark:text-slate-500">Verification</span>
                 {user.emailVerified ? (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-semibold bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-900/30">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-450 border border-blue-200 dark:border-blue-900/30">
                     Verified
                   </span>
                 ) : (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-semibold bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/30">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/20 text-amber-705 dark:text-amber-450 border border-amber-200 dark:border-amber-900/30 animate-pulse">
                     Pending
                   </span>
                 )}
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Join Date</span>
-                <span className="text-slate-700 dark:text-slate-300 font-medium">
+                <span className="text-slate-400 dark:text-slate-500">Join Date</span>
+                <span className="text-slate-700 dark:text-slate-300 font-semibold">
                   {new Date(user.createdAt).toLocaleDateString(undefined, {
                     year: 'numeric',
                     month: 'short',
@@ -344,8 +344,8 @@ export const ProfileDashboard: React.FC<ProfileDashboardProps> = ({ user, onUpda
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Last Login</span>
-                <span className="text-slate-700 dark:text-slate-300 font-medium">
+                <span className="text-slate-400 dark:text-slate-500">Last Login</span>
+                <span className="text-slate-700 dark:text-slate-300 font-semibold truncate max-w-[150px]">
                   {user.lastLoginAt
                     ? new Date(user.lastLoginAt).toLocaleString(undefined, {
                         month: 'short',
@@ -357,37 +357,37 @@ export const ProfileDashboard: React.FC<ProfileDashboardProps> = ({ user, onUpda
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Account ID</span>
-                <span className="text-slate-700 dark:text-slate-300 font-mono">#{user.id}</span>
+                <span className="text-slate-400 dark:text-slate-500">Account ID</span>
+                <span className="text-slate-700 dark:text-slate-300 font-mono font-bold">#{user.id}</span>
               </div>
             </div>
           </div>
 
           {/* Email Unverified Warning Alert */}
           {!user.emailVerified && (
-            <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 rounded-xl p-5 transition-colors duration-200">
+            <div className="bg-amber-50/50 dark:bg-amber-950/10 border border-amber-200/60 dark:border-amber-900/20 rounded-2xl p-5 transition-colors duration-200">
               <div className="flex">
-                <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="flex-shrink-0 mt-0.5">
+                  <svg className="h-5 w-5 text-amber-600 dark:text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
                 </div>
-                <div className="ml-3">
-                  <h4 className="text-sm font-semibold text-amber-800 dark:text-amber-400">Email Unverified</h4>
-                  <p className="mt-1 text-xs text-amber-700 dark:text-amber-500 leading-normal">
+                <div className="ml-3 space-y-2">
+                  <h4 className="text-sm font-bold text-amber-800 dark:text-amber-450">Email Unverified</h4>
+                  <p className="text-xs text-amber-700 dark:text-amber-500 leading-relaxed">
                     Some advanced features are restricted. Please verify your email to unlock all capabilities.
                   </p>
-                  <div className="mt-3">
+                  <div className="pt-1">
                     <button
                       type="button"
                       onClick={handleResendVerification}
                       disabled={isResending}
-                      className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-md text-xs font-semibold shadow-sm focus:outline-none transition-all duration-150 disabled:opacity-50"
+                      className="btn-secondary text-xs px-3 py-1.5"
                     >
                       {isResending ? 'Resending...' : 'Resend Code'}
                     </button>
                     {resendMessage && (
-                      <p className="mt-2 text-2xs text-amber-600 dark:text-amber-450 font-medium">{resendMessage}</p>
+                      <p className="mt-2 text-[10px] text-amber-600 dark:text-amber-400 font-semibold">{resendMessage}</p>
                     )}
                   </div>
                 </div>
@@ -396,27 +396,27 @@ export const ProfileDashboard: React.FC<ProfileDashboardProps> = ({ user, onUpda
           )}
 
           {/* Activity Placeholder Metrics Card */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm p-6 transition-colors duration-200">
-            <h3 className="text-sm font-semibold text-slate-800 dark:text-white mb-4 tracking-tight uppercase">
+          <div className="saas-card">
+            <h3 className="text-xs font-bold text-slate-400 dark:text-slate-500 mb-4 tracking-wider uppercase">
               Activity Summary
             </h3>
             
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-900 p-4 rounded-lg text-center">
-                <span className="text-2xs font-semibold text-slate-400 uppercase tracking-wider block">Solved</span>
-                <span className="text-2xl font-bold text-slate-950 dark:text-white mt-1 block">42</span>
+              <div className="bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-850 p-4 rounded-xl text-center">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Solved</span>
+                <span className="text-xl font-extrabold text-slate-900 dark:text-white mt-1 block">42</span>
               </div>
-              <div className="bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-900 p-4 rounded-lg text-center">
-                <span className="text-2xs font-semibold text-slate-400 uppercase tracking-wider block">Submissions</span>
-                <span className="text-2xl font-bold text-slate-950 dark:text-white mt-1 block">128</span>
+              <div className="bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-850 p-4 rounded-xl text-center">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Submissions</span>
+                <span className="text-xl font-extrabold text-slate-900 dark:text-white mt-1 block">128</span>
               </div>
-              <div className="bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-900 p-4 rounded-lg text-center">
-                <span className="text-2xs font-semibold text-slate-400 uppercase tracking-wider block">Success Rate</span>
-                <span className="text-2xl font-bold text-slate-950 dark:text-white mt-1 block">78.5%</span>
+              <div className="bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-850 p-4 rounded-xl text-center">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Success Rate</span>
+                <span className="text-xl font-extrabold text-slate-900 dark:text-white mt-1 block">78.5%</span>
               </div>
-              <div className="bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-900 p-4 rounded-lg text-center">
-                <span className="text-2xs font-semibold text-slate-400 uppercase tracking-wider block">Current Streak</span>
-                <span className="text-2xl font-bold text-slate-950 dark:text-white mt-1 block">5 days</span>
+              <div className="bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-850 p-4 rounded-xl text-center">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Current Streak</span>
+                <span className="text-xl font-extrabold text-slate-900 dark:text-white mt-1 block">5 days</span>
               </div>
             </div>
           </div>

@@ -47,26 +47,26 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate, onLog
   };
 
   return (
-    <aside className="w-20 lg:w-64 hidden md:flex flex-col border-r border-slate-200/80 dark:border-slate-800/60 bg-slate-50/50 dark:bg-slate-950/20 text-slate-800 dark:text-slate-100 transition-all duration-200">
+    <aside className="w-20 lg:w-64 hidden md:flex flex-col border-r border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-950/10 text-slate-800 dark:text-slate-100 transition-all duration-200">
       
       {/* Navigation Links Area */}
-      <div className="flex-1 px-3 py-6 space-y-2 flex flex-col items-stretch">
+      <div className="flex-1 px-3 py-6 space-y-1.5 flex flex-col items-stretch">
         {links.map((link) => {
           const active = isLinkActive(link.path);
           return (
             <button
               key={link.path}
               onClick={() => onNavigate(link.path)}
-              className={`flex items-center space-x-3.5 px-3.5 py-3 rounded-xl transition-all duration-150 ${
+              className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-150 cursor-pointer ${
                 active
-                  ? 'bg-indigo-500/10 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold border-l-4 border-indigo-500/80'
-                  : 'hover:bg-slate-100 dark:hover:bg-slate-900/60 text-slate-500 dark:text-slate-400 hover:text-slate-850 dark:hover:text-slate-200'
+                  ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-bold shadow-2xs'
+                  : 'text-slate-600 dark:text-slate-450 hover:bg-slate-50 dark:hover:bg-slate-800/40 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
-              <span className={`w-5 h-5 flex-shrink-0 flex items-center justify-center ${active ? 'text-indigo-550 dark:text-indigo-400' : ''}`}>
+              <span className={`w-5 h-5 flex-shrink-0 flex items-center justify-center ${active ? 'text-indigo-600 dark:text-indigo-400' : ''}`}>
                 {link.icon}
               </span>
-              <span className="text-sm font-semibold tracking-tight hidden lg:inline">
+              <span className="text-sm tracking-tight hidden lg:inline">
                 {link.label}
               </span>
             </button>
@@ -79,12 +79,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate, onLog
         {/* Sign Out Button */}
         <button
           onClick={onLogout}
-          className="flex items-center space-x-3.5 px-3.5 py-3 rounded-xl transition-all duration-150 text-rose-500 hover:bg-rose-500/5 hover:text-rose-600 dark:hover:bg-rose-500/10 font-bold mt-auto"
+          className="flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-150 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 font-bold mt-auto cursor-pointer"
         >
           <span className="w-5 h-5 flex-shrink-0 flex items-center justify-center">
             <LogoutIcon />
           </span>
-          <span className="text-sm font-semibold tracking-tight hidden lg:inline">
+          <span className="text-sm tracking-tight hidden lg:inline">
             Sign Out
           </span>
         </button>

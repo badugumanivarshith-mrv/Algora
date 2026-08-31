@@ -8,13 +8,19 @@ interface AuthCardProps {
 
 export const AuthCard: React.FC<AuthCardProps> = ({ title, subtitle, children }) => {
   return (
-    <div className="w-full max-w-md bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-8 shadow-2xl relative overflow-hidden transition-all duration-300 hover:border-slate-700/80">
-      <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-0 left-0 w-32 h-32 bg-violet-500/10 rounded-full blur-3xl"></div>
-
+    <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 rounded-2xl p-8 shadow-xl relative overflow-hidden transition-all duration-200">
+      <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl"></div>
+      
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-black tracking-tight text-white mb-2">{title}</h2>
-        {subtitle && <p className="text-sm text-slate-400">{subtitle}</p>}
+        {/* App Logo Emblem */}
+        <div className="flex justify-center mb-5">
+          <div className="w-10 h-10 rounded-xl bg-indigo-650 dark:bg-indigo-600 flex items-center justify-center shadow-md shadow-indigo-500/20">
+            <span className="text-white font-black text-xl tracking-wider">A</span>
+          </div>
+        </div>
+
+        <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-2">{title}</h2>
+        {subtitle && <p className="text-sm text-slate-500 dark:text-slate-400">{subtitle}</p>}
       </div>
 
       {children}
@@ -28,13 +34,15 @@ interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 export const InputField: React.FC<InputFieldProps> = ({ label, ...props }) => {
   return (
-    <div className="space-y-2">
-      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-        {label}
-      </label>
+    <div className="space-y-1.5">
+      {label && (
+        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+          {label}
+        </label>
+      )}
       <input
         {...props}
-        className="w-full px-4 py-3 bg-slate-950/60 border border-slate-800/80 rounded-xl text-slate-100 text-sm placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
+        className="form-input"
       />
     </div>
   );
@@ -47,13 +55,13 @@ interface AlertProps {
 
 export const Alert: React.FC<AlertProps> = ({ type, message }) => {
   const styles = {
-    success: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-450',
-    error: 'bg-rose-500/10 border-rose-500/20 text-rose-450',
-    info: 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400',
+    success: 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/30 text-emerald-800 dark:text-emerald-400',
+    error: 'bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/30 text-rose-800 dark:text-rose-450',
+    info: 'bg-indigo-50 dark:bg-indigo-950/20 border-indigo-200 dark:border-indigo-900/30 text-indigo-800 dark:text-indigo-400',
   };
 
   return (
-    <div className={`p-4 rounded-xl border text-xs font-semibold ${styles[type]}`}>
+    <div className={`p-3.5 rounded-lg border text-xs font-medium leading-relaxed ${styles[type]}`}>
       {message}
     </div>
   );
@@ -68,7 +76,7 @@ export const SubmitButton: React.FC<SubmitButtonProps> = ({ loading, children, .
     <button
       {...props}
       disabled={loading || props.disabled}
-      className="w-full py-3 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 disabled:opacity-50 text-white rounded-xl font-bold text-sm shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98] flex items-center justify-center space-x-2"
+      className="btn-primary w-full py-2.5"
     >
       {loading ? (
         <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
