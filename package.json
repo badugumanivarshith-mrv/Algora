@@ -13,7 +13,10 @@
     "build:frontend": "npm run build --workspace=frontend",
     "build:backend": "npm run build --workspace=backend",
     "build": "npm run build:frontend && npm run build:backend",
-    "install:all": "npm install"
+    "install:all": "npm install",
+    "lint:frontend": "npm run lint --workspace=frontend",
+    "lint:backend": "npm run lint --workspace=backend",
+    "lint": "npm run lint:frontend && npm run lint:backend"
   },
   "devDependencies": {
     "concurrently": "^9.0.1"

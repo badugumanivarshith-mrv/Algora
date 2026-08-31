@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authController = exports.AuthController = void 0;
+const env_1 = require("../../config/env");
 const auth_service_1 = require("./auth.service");
 const auth_validation_1 = require("./auth.validation");
 class AuthController {
@@ -38,7 +39,7 @@ class AuthController {
                 verificationTokenExpiresAt,
             });
             // Log mock email verification link to backend console
-            const verifyLink = `http://localhost:5173/verify-email?token=${verificationToken}`;
+            const verifyLink = `${env_1.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
             console.log('\n----------------------------------------');
             console.log(`[MOCK EMAIL] Verification email sent to: ${email}`);
             console.log(`[MOCK EMAIL] Click here to verify: ${verifyLink}`);
@@ -100,7 +101,7 @@ class AuthController {
             const verificationTokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
             await auth_service_1.authService.setVerificationToken(user.id, verificationToken, verificationTokenExpiresAt);
             // Log mock email
-            const verifyLink = `http://localhost:5173/verify-email?token=${verificationToken}`;
+            const verifyLink = `${env_1.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
             console.log('\n----------------------------------------');
             console.log(`[MOCK EMAIL] Verification email resent to: ${email}`);
             console.log(`[MOCK EMAIL] Click here to verify: ${verifyLink}`);
@@ -177,7 +178,7 @@ class AuthController {
                 const resetTokenExpiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
                 await auth_service_1.authService.setResetPasswordToken(user.id, resetToken, resetTokenExpiresAt);
                 // Log mock email
-                const resetLink = `http://localhost:5173/reset-password?token=${resetToken}`;
+                const resetLink = `${env_1.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
                 console.log('\n----------------------------------------');
                 console.log(`[MOCK EMAIL] Password reset email sent to: ${email}`);
                 console.log(`[MOCK EMAIL] Click here to reset: ${resetLink}`);
@@ -303,7 +304,7 @@ class AuthController {
                 updates.verificationToken = verificationToken;
                 updates.verificationTokenExpiresAt = verificationTokenExpiresAt;
                 // Log mock email
-                const verifyLink = `http://localhost:5173/verify-email?token=${verificationToken}`;
+                const verifyLink = `${env_1.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
                 console.log('\n----------------------------------------');
                 console.log(`[MOCK EMAIL] Email update requested. Verification email sent to: ${email}`);
                 console.log(`[MOCK EMAIL] Click here to verify: ${verifyLink}`);

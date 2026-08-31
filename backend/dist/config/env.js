@@ -14,6 +14,7 @@ const envSchema = zod_1.z.object({
     DATABASE_URL: zod_1.z.string().url(),
     NODE_ENV: zod_1.z.enum(['development', 'production', 'test']).default('development'),
     JWT_SECRET: zod_1.z.string().default('dev_secret_key_for_algora_ai_change_in_production'),
+    FRONTEND_URL: zod_1.z.string().url().default('http://localhost:5173'),
 });
 const parsed = envSchema.safeParse(process.env);
 if (!parsed.success) {

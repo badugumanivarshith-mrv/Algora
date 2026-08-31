@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { env } from '../../config/env';
 import { authService } from './auth.service';
 import {
   registerSchema,
@@ -51,7 +52,7 @@ export class AuthController {
       });
 
       // Log mock email verification link to backend console
-      const verifyLink = `http://localhost:5173/verify-email?token=${verificationToken}`;
+      const verifyLink = `${env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
       console.log('\n----------------------------------------');
       console.log(`[MOCK EMAIL] Verification email sent to: ${email}`);
       console.log(`[MOCK EMAIL] Click here to verify: ${verifyLink}`);
@@ -124,7 +125,7 @@ export class AuthController {
       await authService.setVerificationToken(user.id, verificationToken, verificationTokenExpiresAt);
 
       // Log mock email
-      const verifyLink = `http://localhost:5173/verify-email?token=${verificationToken}`;
+      const verifyLink = `${env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
       console.log('\n----------------------------------------');
       console.log(`[MOCK EMAIL] Verification email resent to: ${email}`);
       console.log(`[MOCK EMAIL] Click here to verify: ${verifyLink}`);
@@ -213,7 +214,7 @@ export class AuthController {
         await authService.setResetPasswordToken(user.id, resetToken, resetTokenExpiresAt);
 
         // Log mock email
-        const resetLink = `http://localhost:5173/reset-password?token=${resetToken}`;
+        const resetLink = `${env.FRONTEND_URL}/reset-password?token=${resetToken}`;
         console.log('\n----------------------------------------');
         console.log(`[MOCK EMAIL] Password reset email sent to: ${email}`);
         console.log(`[MOCK EMAIL] Click here to reset: ${resetLink}`);
@@ -365,7 +366,7 @@ export class AuthController {
         updates.verificationTokenExpiresAt = verificationTokenExpiresAt;
 
         // Log mock email
-        const verifyLink = `http://localhost:5173/verify-email?token=${verificationToken}`;
+        const verifyLink = `${env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
         console.log('\n----------------------------------------');
         console.log(`[MOCK EMAIL] Email update requested. Verification email sent to: ${email}`);
         console.log(`[MOCK EMAIL] Click here to verify: ${verifyLink}`);
