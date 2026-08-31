@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import healthRouter from './modules/health/health.routes';
+import authRouter from './modules/auth/auth.routes';
 
 const app = express();
 
@@ -9,6 +10,7 @@ app.use(express.json());
 
 // Mount API routes
 app.use('/api/health', healthRouter);
+app.use('/api/auth', authRouter);
 
 // Basic global error handler
 app.use((err: unknown, req: express.Request, res: express.Response, _next: express.NextFunction) => {

@@ -13,6 +13,7 @@ const envSchema = zod_1.z.object({
     PORT: zod_1.z.coerce.number().default(5000),
     DATABASE_URL: zod_1.z.string().url(),
     NODE_ENV: zod_1.z.enum(['development', 'production', 'test']).default('development'),
+    JWT_SECRET: zod_1.z.string().default('dev_secret_key_for_algora_ai_change_in_production'),
 });
 const parsed = envSchema.safeParse(process.env);
 if (!parsed.success) {

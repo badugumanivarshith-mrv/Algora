@@ -1,4 +1,12 @@
 import { useEffect, useState } from 'react';
+import { getAuthToken, removeAuthToken, request, UserProfile } from './features/auth/auth.service';
+import { Login } from './features/auth/login';
+import { Register } from './features/auth/register';
+import { VerifyEmail } from './features/auth/verify-email';
+import { ForgotPassword } from './features/auth/forgot-password';
+import { ResetPassword } from './features/auth/reset-password';
+import { Profile } from './features/auth/profile';
+import { ChangePassword } from './features/auth/change-password';
 
 interface HealthData {
   status: string;
@@ -9,25 +17,58 @@ interface HealthData {
 }
 
 export default function App() {
+  const [path, setPath] = useState(window.location.pathname);
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [checkingSession, setCheckingSession] = useState(true);
   const [health, setHealth] = useState<HealthData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [healthLoading, setHealthLoading] = useState(false);
 
+  // Native custom router
+  const navigate = (newPath: string) => {
+    window.history.pushState(null, '', newPath);
+    setPath(newPath);
+  };
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setPath(window.location.pathname);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
+
+  // Check active session on mount
+  useEffect(() => {
+    const checkSession = async () => {
+      const token = getAuthToken();
+      if (token) {
+        const result = await request<{ user: UserProfile }>('/api/auth/profile');
+        if (result.data) {
+          setUser(result.data.user);
+        } else {
+          removeAuthToken();
+        }
+      }
+      setCheckingSession(false);
+    };
+    checkSession();
+  }, []);
+
+  // Fetch health data
   const fetchHealth = async () => {
-    setLoading(true);
-    setError(null);
+    setHealthLoading(true);
     try {
       const response = await fetch('/api/health');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (response.ok) {
+        const data = await response.json();
+        setHealth(data);
       }
-      const data: HealthData = await response.json();
-      setHealth(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to connect to backend server');
-      setHealth(null);
+      console.error('Health fetch failed:', err);
     } finally {
-      setLoading(false);
+      setHealthLoading(false);
     }
   };
 
@@ -35,12 +76,34 @@ export default function App() {
     fetchHealth();
   }, []);
 
+  const handleLogout = () => {
+    removeAuthToken();
+    setUser(null);
+    navigate('/login');
+  };
+
+  if (checkingSession) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400 font-sans">
+        <div className="flex flex-col items-center space-y-4">
+          <span className="w-10 h-10 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></span>
+          <p className="text-sm font-semibold tracking-wider">Loading Algora AI...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Route protection
+  const isAuthenticated = !!user;
+  const isAuthRoute = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-email'].includes(path);
+
+  // Render main layout
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-slate-100 flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white">
       {/* Header */}
       <header className="border-b border-slate-800/60 backdrop-blur-md sticky top-0 z-50 bg-slate-955/40">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigate(isAuthenticated ? '/' : '/login')}>
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
               <span className="text-white font-extrabold text-xl tracking-wider">A</span>
             </div>
@@ -49,182 +112,146 @@ export default function App() {
                 ALGORA AI
               </h1>
               <p className="text-[10px] text-indigo-400 font-semibold tracking-widest uppercase">
-                Phase 1 Foundation
+                Phase 2 Authenticated
               </p>
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
-              React + Vite + TS
-            </span>
+            {isAuthenticated ? (
+              <div className="flex items-center space-x-4">
+                <span className="text-xs font-semibold text-slate-400 hidden sm:inline">
+                  Signed in as <strong className="text-slate-200">{user.username}</strong>
+                </span>
+                <button
+                  onClick={handleLogout}
+                  className="px-4 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/20 rounded-xl text-xs font-bold transition-all active:scale-95"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              !isAuthRoute && (
+                <button
+                  onClick={() => navigate('/login')}
+                  className="px-4 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/20 rounded-xl text-xs font-bold transition-all active:scale-95"
+                >
+                  Sign In
+                </button>
+              )
+            )}
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 max-w-5xl w-full mx-auto px-6 py-12 flex flex-col justify-center">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4 text-white">
-            System Initialization <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">Verified</span>
-          </h2>
-          <p className="text-slate-400 max-w-xl mx-auto text-base md:text-lg">
-            All foundation components for Phase 1 have been generated. Below is the live connection monitoring dashboard.
-          </p>
-        </div>
-
-        {/* Dashboard Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {/* Database & API Status Card */}
-          <div className="bg-slate-900/40 backdrop-blur-md border border-slate-800/80 rounded-2xl p-6 shadow-xl relative overflow-hidden transition-all duration-300 hover:border-slate-700/80 hover:shadow-indigo-500/5">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl"></div>
-            <h3 className="text-lg font-bold text-slate-200 mb-4 flex items-center">
-              <span className="w-2.5 h-2.5 rounded-full bg-indigo-400 mr-2.5 animate-pulse"></span>
-              Live Connection Status
-            </h3>
-
-            {loading ? (
-              <div className="space-y-4 py-4">
-                <div className="h-6 bg-slate-800/60 rounded-md animate-pulse w-3/4"></div>
-                <div className="h-12 bg-slate-800/60 rounded-md animate-pulse"></div>
-              </div>
-            ) : error ? (
-              <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-sm">
-                <p className="font-semibold mb-1">Backend Connection Failed</p>
-                <p className="text-rose-400/90 text-xs font-mono">{error}</p>
-                <button
-                  onClick={fetchHealth}
-                  className="mt-3 px-3 py-1.5 bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 rounded-lg text-xs font-semibold transition-all border border-rose-500/30"
-                >
-                  Retry Connection
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="flex justify-between items-center py-2 border-b border-slate-800/40">
-                  <span className="text-sm text-slate-400">Server Health</span>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    Active
-                  </span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b border-slate-800/40">
-                  <span className="text-sm text-slate-400">Database Status</span>
-                  <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      health?.db === 'connected'
-                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                        : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                    }`}
+      {/* Main Content Area */}
+      <main className="flex-1 flex flex-col items-center justify-center px-6 py-12">
+        {/* Unauthenticated View Options */}
+        {!isAuthenticated && (
+          <div className="w-full flex justify-center">
+            {path === '/login' && (
+              <Login onNavigate={navigate} onLoginSuccess={(u) => { setUser(u); navigate('/'); }} />
+            )}
+            {path === '/register' && (
+              <Register onNavigate={navigate} />
+            )}
+            {path === '/verify-email' && (
+              <VerifyEmail onNavigate={navigate} />
+            )}
+            {path === '/forgot-password' && (
+              <ForgotPassword onNavigate={navigate} />
+            )}
+            {path === '/reset-password' && (
+              <ResetPassword onNavigate={navigate} />
+            )}
+            {!isAuthRoute && (
+              <div className="text-center space-y-6">
+                <h2 className="text-4xl font-black text-white tracking-tight">
+                  Welcome to <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">Algora AI</span>
+                </h2>
+                <p className="text-slate-400 max-w-md mx-auto text-sm leading-relaxed">
+                  A modern coding platform. Sign in to view your learning dashboard and manage your profile.
+                </p>
+                <div className="flex justify-center space-x-4">
+                  <button
+                    onClick={() => navigate('/login')}
+                    className="px-6 py-3 bg-indigo-500 text-white font-bold rounded-xl text-sm shadow-lg shadow-indigo-500/20 hover:bg-indigo-600 transition-all"
                   >
-                    {health?.db === 'connected' ? 'PostgreSQL Connected' : 'Disconnected'}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b border-slate-800/40">
-                  <span className="text-sm text-slate-400">Server Uptime</span>
-                  <span className="text-sm text-slate-200 font-mono">
-                    {health ? `${health.uptime.toFixed(1)}s` : '-'}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center py-2">
-                  <span className="text-sm text-slate-400">Timestamp</span>
-                  <span className="text-xs text-slate-300 font-mono">
-                    {health ? new Date(health.timestamp).toLocaleTimeString() : '-'}
-                  </span>
+                    Log In
+                  </button>
+                  <button
+                    onClick={() => navigate('/register')}
+                    className="px-6 py-3 bg-slate-900 border border-slate-800 text-slate-350 font-bold rounded-xl text-sm hover:border-slate-700 transition-all"
+                  >
+                    Sign Up
+                  </button>
                 </div>
               </div>
             )}
           </div>
+        )}
 
-          {/* Tech Stack Blueprint Card */}
-          <div className="bg-slate-900/40 backdrop-blur-md border border-slate-800/80 rounded-2xl p-6 shadow-xl relative overflow-hidden transition-all duration-300 hover:border-slate-700/80 hover:shadow-violet-500/5">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-violet-500/5 rounded-full blur-3xl"></div>
-            <h3 className="text-lg font-bold text-slate-200 mb-4 flex items-center">
-              <span className="w-2.5 h-2.5 rounded-full bg-violet-400 mr-2.5"></span>
-              Algora Foundation Blueprint
-            </h3>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 bg-slate-955/40 border border-slate-800/40 rounded-xl">
-                <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider">Frontend</span>
-                <span className="text-sm font-semibold text-slate-300">Vite + React</span>
-              </div>
-              <div className="p-3 bg-slate-955/40 border border-slate-800/40 rounded-xl">
-                <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider">Styling</span>
-                <span className="text-sm font-semibold text-indigo-300">Tailwind CSS v4</span>
-              </div>
-              <div className="p-3 bg-slate-955/40 border border-slate-800/40 rounded-xl">
-                <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider">Backend</span>
-                <span className="text-sm font-semibold text-slate-300">Express + TS</span>
-              </div>
-              <div className="p-3 bg-slate-955/40 border border-slate-800/40 rounded-xl">
-                <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider">ORM</span>
-                <span className="text-sm font-semibold text-violet-300">Drizzle ORM</span>
-              </div>
+        {/* Authenticated Dashboard View */}
+        {isAuthenticated && (
+          <div className="max-w-5xl w-full space-y-8">
+            <div className="text-center sm:text-left mb-6">
+              <h2 className="text-3xl font-black text-white tracking-tight">
+                Welcome back, <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">{user.username}</span>
+              </h2>
+              <p className="text-slate-400 text-sm mt-1">
+                Manage your credentials, update your email or username, and view database states.
+              </p>
             </div>
-            <div className="mt-4 p-3 bg-indigo-500/5 border border-indigo-500/10 rounded-xl flex items-center space-x-2.5">
-              <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-              <span className="text-xs text-slate-400 font-medium">PostgreSQL connection pool verified.</span>
-            </div>
-          </div>
-        </div>
 
-        {/* Directory Validation List */}
-        <div className="bg-slate-900/30 border border-slate-800/60 rounded-2xl p-6">
-          <h3 className="text-base font-bold text-slate-300 mb-4">Structure Conformity Check</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
-            <div className="space-y-2">
-              <span className="text-slate-500 font-bold uppercase text-[9px] tracking-wider block">Backend folders</span>
-              <div className="flex items-center space-x-2 text-slate-300">
-                <span className="text-emerald-400">✔</span>
-                <span>src/routes</span>
-              </div>
-              <div className="flex items-center space-x-2 text-slate-300">
-                <span className="text-emerald-400">✔</span>
-                <span>src/controllers</span>
-              </div>
-              <div className="flex items-center space-x-2 text-slate-300">
-                <span className="text-emerald-400">✔</span>
-                <span>src/services</span>
-              </div>
-              <div className="flex items-center space-x-2 text-slate-300">
-                <span className="text-emerald-400">✔</span>
-                <span>src/middleware</span>
-              </div>
-              <div className="flex items-center space-x-2 text-slate-300">
-                <span className="text-emerald-400">✔</span>
-                <span>src/db</span>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Profile panel */}
+              <Profile user={user} onUpdateSuccess={(u) => setUser(u)} onLogout={handleLogout} />
+
+              {/* Password update panel */}
+              <ChangePassword onLogout={handleLogout} />
             </div>
-            <div className="space-y-2">
-              <span className="text-slate-500 font-bold uppercase text-[9px] tracking-wider block">Frontend folders</span>
-              <div className="flex items-center space-x-2 text-slate-300">
-                <span className="text-emerald-400">✔</span>
-                <span>src/pages</span>
+
+            {/* Health checking segment from Phase 1 */}
+            <div className="bg-slate-900/30 border border-slate-800/60 rounded-2xl p-6 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl"></div>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-sm font-bold text-slate-300 flex items-center">
+                  <span className="w-2 h-2 rounded-full bg-emerald-450 mr-2"></span>
+                  System Health Checks
+                </h3>
+                <button
+                  onClick={fetchHealth}
+                  disabled={healthLoading}
+                  className="px-3 py-1 bg-slate-850 hover:bg-slate-800 text-slate-300 rounded-lg text-xs font-semibold transition-all border border-slate-800"
+                >
+                  {healthLoading ? 'Refreshing...' : 'Refresh'}
+                </button>
               </div>
-              <div className="flex items-center space-x-2 text-slate-300">
-                <span className="text-emerald-400">✔</span>
-                <span>src/components</span>
-              </div>
-              <div className="flex items-center space-x-2 text-slate-300">
-                <span className="text-emerald-400">✔</span>
-                <span>src/features</span>
-              </div>
-              <div className="flex items-center space-x-2 text-slate-300">
-                <span className="text-emerald-400">✔</span>
-                <span>src/services</span>
-              </div>
-              <div className="flex items-center space-x-2 text-slate-300">
-                <span className="text-emerald-400">✔</span>
-                <span>src/hooks</span>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-mono">
+                <div className="p-3 bg-slate-950/40 border border-slate-800/40 rounded-xl">
+                  <span className="block text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1">Server Status</span>
+                  <span className="text-slate-200">{health ? 'Active' : 'Offline'}</span>
+                </div>
+                <div className="p-3 bg-slate-950/40 border border-slate-800/40 rounded-xl">
+                  <span className="block text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1">Database status</span>
+                  <span className={`font-semibold ${health?.db === 'connected' ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    {health?.db === 'connected' ? 'Connected' : 'Disconnected'}
+                  </span>
+                </div>
+                <div className="p-3 bg-slate-950/40 border border-slate-800/40 rounded-xl">
+                  <span className="block text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1">Uptime</span>
+                  <span className="text-slate-300">{health ? `${health.uptime.toFixed(1)}s` : '-'}</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-800/40 py-6 mt-12 bg-slate-950/20 text-center">
+      <footer className="border-t border-slate-800/40 py-6 mt-12 bg-slate-955/20 text-center">
         <p className="text-xs text-slate-500">
-          Algora AI © 2026. Phase 1 Architecture Foundation Completed.
+          Algora AI © 2026. Phase 2 Authentication System Verified.
         </p>
       </footer>
     </div>

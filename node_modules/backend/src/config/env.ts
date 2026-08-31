@@ -9,6 +9,7 @@ const envSchema = z.object({
   PORT: z.coerce.number().default(5000),
   DATABASE_URL: z.string().url(),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  JWT_SECRET: z.string().default('dev_secret_key_for_algora_ai_change_in_production'),
 });
 
 const parsed = envSchema.safeParse(process.env);
