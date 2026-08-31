@@ -38,7 +38,8 @@ export const submissionStatusEnum = pgEnum('submission_status', [
   'Wrong Answer',
   'Runtime Error',
   'Compilation Error',
-  'Time Limit Exceeded'
+  'Time Limit Exceeded',
+  'Memory Limit Exceeded'
 ]);
 
 export const problems = pgTable('problems', {
@@ -104,3 +105,42 @@ export const submissions = pgTable('submissions', {
 
 export type Submission = typeof submissions.$inferSelect;
 export type NewSubmission = typeof submissions.$inferInsert;
+
+// --- Phase 7: Online Judge Engine Schemas ---
+
+export const submissionResults = pgTable('submission_results', {
+  id: serial('id').primaryKey(),
+  submissionId: integer('submission_id').notNull().references(() => submissions.id, { onDelete: 'cascade' }),
+  testCaseId: integer('test_case_id').notNull().references(() => testCases.id, { onDelete: 'cascade' }),
+  status: submissionStatusEnum('status').notNull(),
+  runtime: integer('runtime'),
+  memory: integer('memory'),
+  errorMessage: text('error_message'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export type SubmissionResult = typeof submissionResults.$inferSelect;
+export type NewSubmissionResult = typeof submissionResults.$inferInsert;
+
+export const executionJobs = pgTable('execution_jobs', {
+  id: serial('id').primaryKey(),
+  submissionId: integer('submission_id').notNull().references(() => submissions.id, { onDelete: 'cascade' }),
+  status: varchar('status', { length: 50 }).default('queued').notNull(),
+  startedAt: timestamp('started_at'),
+  completedAt: timestamp('completed_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export type ExecutionJob = typeof executionJobs.$inferSelect;
+export type NewExecutionJob = typeof executionJobs.$inferInsert;
+
+export const solvedProblems = pgTable('solved_problems', {
+  userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  problemId: integer('problem_id').notNull().references(() => problems.id, { onDelete: 'cascade' }),
+  firstSolvedAt: timestamp('first_solved_at').defaultNow().notNull(),
+}, (table) => ({
+  pk: primaryKey({ columns: [table.userId, table.problemId] }),
+}));
+
+export type SolvedProblem = typeof solvedProblems.$inferSelect;
+export type NewSolvedProblem = typeof solvedProblems.$inferInsert;

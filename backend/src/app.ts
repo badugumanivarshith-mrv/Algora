@@ -5,6 +5,8 @@ import authRouter from './modules/auth/auth.routes';
 import profileRouter from './modules/profile/profile.routes';
 import problemsRouter from './modules/problems/problem.routes';
 import submissionsRouter from './modules/submissions/submission.routes';
+import judgeRouter from './modules/judge/judge.routes';
+import leaderboardRouter from './modules/leaderboard/leaderboard.routes';
 import { problemController } from './modules/problems/problem.controller';
 
 import { env } from './config/env';
@@ -20,6 +22,8 @@ app.use('/api/auth', authRouter);
 app.use('/api/profile', profileRouter);
 app.use('/api/problems', problemsRouter);
 app.use('/api/submissions', submissionsRouter);
+app.use('/api/judge', judgeRouter);
+app.use('/api/leaderboard', leaderboardRouter);
 app.get('/api/tags', problemController.getTags);
 
 app.get('/api/system/email-status', (req, res) => {

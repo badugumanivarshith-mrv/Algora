@@ -13,6 +13,8 @@ import { AccountSettings } from './features/profile/account-settings';
 import { ProblemsList } from './features/problems/problems-list';
 import { ProblemWorkspace } from './features/problems/problem-workspace';
 import { SubmissionsList } from './features/problems/submissions-list';
+import { SubmissionDetails } from './features/submissions/submission-details';
+import { LeaderboardPage } from './features/leaderboard/leaderboard-page';
 
 export default function App() {
   return (
@@ -133,6 +135,14 @@ function AppContent() {
 
       {path === '/submissions' && (
         <SubmissionsList onNavigate={navigate} />
+      )}
+
+      {path.startsWith('/submissions/') && (
+        <SubmissionDetails id={parseInt(path.replace('/submissions/', ''), 10)} onNavigate={navigate} />
+      )}
+
+      {path === '/leaderboard' && (
+        <LeaderboardPage />
       )}
 
       {path === '/profile' && (

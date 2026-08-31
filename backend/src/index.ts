@@ -1,6 +1,7 @@
 import app from './app';
 import { env } from './config/env';
 import { seedDatabase } from './db/seed';
+import { workerProcessor } from './workers/worker.processor';
 
 const server = app.listen(env.PORT, async () => {
   console.log(`🚀 Server running in ${env.NODE_ENV} mode on port ${env.PORT}`);
@@ -11,6 +12,10 @@ const server = app.listen(env.PORT, async () => {
   } catch (err) {
     console.error('Failed to seed database:', err);
   }
+
+  // Start judge queue worker polling
+  workerProcessor.startWorkerLoop(300);
+  console.log('⚡ Judge worker queue listener started.');
 });
 
 // Handle graceful shutdown signals

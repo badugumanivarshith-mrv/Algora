@@ -32,6 +32,12 @@ const HistoryIcon = () => (
   </svg>
 );
 
+const TrophyIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4m12 0h4m-2-2v4m-5 13l-3-3m0 0l-3 3m3-3V10m0 0a4 4 0 10-8 0v4m8-4a4 4 0 118 0v4" />
+  </svg>
+);
+
 const LogoutIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -49,6 +55,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate, onLog
     { label: 'Dashboard', path: '/dashboard', icon: <DashboardIcon /> },
     { label: 'Problems', path: '/problems', icon: <CodeIcon /> },
     { label: 'Submissions', path: '/submissions', icon: <HistoryIcon /> },
+    { label: 'Leaderboard', path: '/leaderboard', icon: <TrophyIcon /> },
     { label: 'Profile', path: '/profile', icon: <ProfileIcon /> },
     { label: 'Settings', path: '/settings', icon: <SettingsIcon /> },
   ];

@@ -1,29 +1,118 @@
-import React from 'react';
-import { UserProfile } from '../auth/auth.service';
+import React, { useEffect, useState } from 'react';
+import { UserProfile, request } from '../auth/auth.service';
 
 interface DashboardHomeProps {
   user: UserProfile;
   onNavigate: (path: string) => void;
 }
 
+interface UserProgress {
+  easySolved: number;
+  totalEasy: number;
+  mediumSolved: number;
+  totalMedium: number;
+  hardSolved: number;
+  totalHard: number;
+  totalSolved: number;
+  totalSubmissions: number;
+  acceptanceRate: number;
+}
+
 export const DashboardHome: React.FC<DashboardHomeProps> = ({ user, onNavigate }) => {
+  const [progress, setProgress] = useState<UserProgress | null>(null);
+
+  useEffect(() => {
+    const fetchProgress = async () => {
+      const res = await request<{ progress: UserProgress }>('/api/leaderboard/progress');
+      if (res.data) {
+        setProgress(res.data.progress);
+      }
+    };
+
+    fetchProgress();
+  }, []);
+
   return (
     <div className="space-y-6">
       {/* Header welcome banner */}
-      <div className="bg-indigo-50/20 dark:bg-slate-900 border border-indigo-100/50 dark:border-slate-800 rounded-2xl p-6 sm:p-8">
+      <div className="bg-indigo-50/20 dark:bg-slate-900 border border-indigo-100/50 dark:border-slate-800 rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="space-y-2">
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
             Welcome back, <span className="text-indigo-600 dark:text-indigo-400">{user.displayName || user.username}</span>!
           </h2>
           <p className="text-slate-500 dark:text-slate-400 text-sm max-w-xl leading-relaxed">
-            You're currently signed in and have access to the Algora AI dashboard shell. Track system health or adjust your settings below.
+            Solve algorithms challenges, test solution runtimes, and climb the global rankings leaderboard.
           </p>
+        </div>
+
+        <div className="flex items-center space-x-3">
+          <button onClick={() => onNavigate('/problems')} className="btn-primary py-2 px-4 text-xs font-bold">
+            Coding Problems →
+          </button>
+          <button onClick={() => onNavigate('/leaderboard')} className="btn-secondary py-2 px-4 text-xs font-bold">
+            Leaderboard
+          </button>
         </div>
       </div>
 
+      {/* User Progress Stats Grid */}
+      {progress && (
+        <div className="saas-card space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Coding Progress & Solved Problems</h3>
+            <span className="text-xs font-bold text-slate-400">Acceptance Rate: {progress.acceptanceRate}%</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
+              <p className="text-2xs font-bold text-slate-400 uppercase">Total Solved</p>
+              <p className="text-2xl font-black text-slate-900 dark:text-white mt-1">{progress.totalSolved}</p>
+            </div>
+
+            <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
+              <div className="flex justify-between text-xs font-bold">
+                <span className="text-emerald-600 dark:text-emerald-400">Easy</span>
+                <span className="text-slate-700 dark:text-slate-300">{progress.easySolved} / {progress.totalEasy}</span>
+              </div>
+              <div className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-emerald-500 rounded-full"
+                  style={{ width: `${progress.totalEasy > 0 ? (progress.easySolved / progress.totalEasy) * 100 : 0}%` }}
+                ></div>
+              </div>
+            </div>
+
+            <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
+              <div className="flex justify-between text-xs font-bold">
+                <span className="text-amber-600 dark:text-amber-400">Medium</span>
+                <span className="text-slate-700 dark:text-slate-300">{progress.mediumSolved} / {progress.totalMedium}</span>
+              </div>
+              <div className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-amber-500 rounded-full"
+                  style={{ width: `${progress.totalMedium > 0 ? (progress.mediumSolved / progress.totalMedium) * 100 : 0}%` }}
+                ></div>
+              </div>
+            </div>
+
+            <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
+              <div className="flex justify-between text-xs font-bold">
+                <span className="text-rose-600 dark:text-rose-400">Hard</span>
+                <span className="text-slate-700 dark:text-slate-300">{progress.hardSolved} / {progress.totalHard}</span>
+              </div>
+              <div className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-rose-500 rounded-full"
+                  style={{ width: `${progress.totalHard > 0 ? (progress.hardSolved / progress.totalHard) * 100 : 0}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Metric Cards Section */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        
         {/* Profile Status Card */}
         <div className="saas-card space-y-4">
           <div className="flex items-center justify-between">
@@ -81,34 +170,6 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ user, onNavigate }
           <div className="pt-2">
             <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">
               Status: {user.emailVerified ? 'Verified' : 'Unverified'}
-            </span>
-          </div>
-        </div>
-
-      </div>
-
-      {/* Account metadata breakdown table */}
-      <div className="saas-card space-y-4">
-        <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Session Information</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-xs font-medium text-slate-500 dark:text-slate-400">
-          <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
-            <span>Username:</span>
-            <span className="text-slate-800 dark:text-slate-200 font-bold">{user.username}</span>
-          </div>
-          <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
-            <span>Email Address:</span>
-            <span className="text-slate-800 dark:text-slate-200 font-bold">{user.email}</span>
-          </div>
-          <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2 sm:border-0 sm:pb-0">
-            <span>Verification Status:</span>
-            <span className={`font-bold ${user.emailVerified ? 'text-emerald-600 dark:text-emerald-450' : 'text-amber-650 dark:text-amber-450'}`}>
-              {user.emailVerified ? 'Verified Account' : 'Verification Required'}
-            </span>
-          </div>
-          <div className="flex justify-between">
-            <span>Registration Timestamp:</span>
-            <span className="text-slate-800 dark:text-slate-200 font-bold">
-              {new Date(user.createdAt).toLocaleString()}
             </span>
           </div>
         </div>

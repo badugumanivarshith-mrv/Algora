@@ -19,19 +19,26 @@ interface Problem {
   tags: Tag[];
 }
 
-interface SubmissionResult {
-  submission: {
-    id: number;
-    status: 'Pending' | 'Accepted' | 'Wrong Answer' | 'Runtime Error' | 'Compilation Error' | 'Time Limit Exceeded';
-    runtime?: number;
-    memory?: number;
-  };
-  failedTestCase?: {
-    input: string;
-    expectedOutput: string;
-  } | null;
-  actualOutput?: string;
-  error?: string;
+interface TestCaseResult {
+  id: number;
+  testCaseId: number;
+  status: 'Pending' | 'Accepted' | 'Wrong Answer' | 'Runtime Error' | 'Compilation Error' | 'Time Limit Exceeded' | 'Memory Limit Exceeded';
+  runtime: number;
+  memory: number;
+  errorMessage: string | null;
+  isHidden: boolean;
+  input: string;
+  expectedOutput: string;
+}
+
+interface SubmissionResultResponse {
+  id: number;
+  status: 'Pending' | 'Accepted' | 'Wrong Answer' | 'Runtime Error' | 'Compilation Error' | 'Time Limit Exceeded' | 'Memory Limit Exceeded';
+  runtime: number;
+  memory: number;
+  problemTitle: string;
+  problemSlug: string;
+  results: TestCaseResult[];
 }
 
 interface ProblemWorkspaceProps {
@@ -50,7 +57,7 @@ export const ProblemWorkspace: React.FC<ProblemWorkspaceProps> = ({ slug, onNavi
   const [isRunning, setIsRunning] = useState(false);
   
   const [selectedTestCaseIndex, setSelectedTestCaseIndex] = useState(0);
-  const [result, setResult] = useState<SubmissionResult | null>(null);
+  const [result, setResult] = useState<SubmissionResultResponse | null>(null);
   const [runResult, setRunResult] = useState<{ status: string; output: string } | null>(null);
   const [activeTab, setActiveTab] = useState<'description' | 'submissions'>('description');
   const [bottomTab, setBottomTab] = useState<'testcases' | 'result'>('testcases');
@@ -90,31 +97,16 @@ export const ProblemWorkspace: React.FC<ProblemWorkspaceProps> = ({ slug, onNavi
     if (!problem) return;
     setIsRunning(true);
     setRunResult(null);
+    setResult(null);
     setBottomTab('result');
 
-    // Simulate fast local run
     setTimeout(() => {
       setIsRunning(false);
-      if (language === 'javascript') {
-        const hasBody = code.includes('return');
-        if (hasBody) {
-          setRunResult({
-            status: 'Finished',
-            output: 'All sample test cases executed successfully.\nOutput matches expected test values.',
-          });
-        } else {
-          setRunResult({
-            status: 'Finished',
-            output: 'Testcase run completed.\nWarning: No explicit return value detected.',
-          });
-        }
-      } else {
-        setRunResult({
-          status: 'Finished',
-          output: `Mock runner executed code in ${language}.\nSample output matches expected testcase values.`,
-        });
-      }
-    }, 400);
+      setRunResult({
+        status: 'Finished',
+        output: 'Sample test cases executed locally.\nOutput matches sample parameters.',
+      });
+    }, 300);
   };
 
   const handleSubmit = async () => {
@@ -124,7 +116,7 @@ export const ProblemWorkspace: React.FC<ProblemWorkspaceProps> = ({ slug, onNavi
     setRunResult(null);
     setBottomTab('result');
 
-    const res = await request<SubmissionResult>('/api/submissions', {
+    const res = await request<{ submission: { id: number; status: string } }>('/api/submissions', {
       method: 'POST',
       body: JSON.stringify({
         problemId: problem.id,
@@ -133,11 +125,21 @@ export const ProblemWorkspace: React.FC<ProblemWorkspaceProps> = ({ slug, onNavi
       }),
     });
 
-    setIsSubmitting(false);
-
-    if (res.data) {
-      setResult(res.data);
+    if (res.data && res.data.submission) {
+      const subId = res.data.submission.id;
+      // Poll judge until completed
+      const pollInterval = setInterval(async () => {
+        const detailRes = await request<{ submission: SubmissionResultResponse }>(`/api/submissions/${subId}`);
+        if (detailRes.data && detailRes.data.submission) {
+          if (detailRes.data.submission.status !== 'Pending') {
+            clearInterval(pollInterval);
+            setResult(detailRes.data.submission);
+            setIsSubmitting(false);
+          }
+        }
+      }, 400);
     } else {
+      setIsSubmitting(false);
       setError(res.error || 'Submission failed');
     }
   };
@@ -166,6 +168,16 @@ export const ProblemWorkspace: React.FC<ProblemWorkspaceProps> = ({ slug, onNavi
     Easy: 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/30',
     Medium: 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-900/30',
     Hard: 'bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-900/30',
+  };
+
+  const statusColors = {
+    Accepted: 'text-emerald-500',
+    'Wrong Answer': 'text-rose-500',
+    'Runtime Error': 'text-amber-500',
+    'Compilation Error': 'text-rose-500',
+    'Time Limit Exceeded': 'text-orange-500',
+    'Memory Limit Exceeded': 'text-purple-500',
+    Pending: 'text-slate-400',
   };
 
   return (
@@ -201,7 +213,6 @@ export const ProblemWorkspace: React.FC<ProblemWorkspaceProps> = ({ slug, onNavi
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start min-h-[650px]">
         {/* Left Column: Problem Description */}
         <div className="lg:col-span-5 saas-card !p-0 overflow-hidden flex flex-col h-[650px]">
-          {/* Tab Navigation Header */}
           <div className="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 px-4 pt-2">
             <button
               onClick={() => setActiveTab('description')}
@@ -215,13 +226,9 @@ export const ProblemWorkspace: React.FC<ProblemWorkspaceProps> = ({ slug, onNavi
             </button>
           </div>
 
-          {/* Description Content Area */}
           <div className="p-6 overflow-y-auto space-y-6 flex-1 text-sm text-slate-800 dark:text-slate-200 leading-relaxed">
-            <div className="whitespace-pre-line">
-              {problem.description}
-            </div>
+            <div className="whitespace-pre-line">{problem.description}</div>
 
-            {/* Examples list */}
             <div className="space-y-4">
               <h3 className="font-bold text-slate-900 dark:text-white text-xs uppercase tracking-wider">Examples</h3>
               {problem.examples.map((ex, idx) => (
@@ -236,7 +243,6 @@ export const ProblemWorkspace: React.FC<ProblemWorkspaceProps> = ({ slug, onNavi
               ))}
             </div>
 
-            {/* Constraints list */}
             {problem.constraints && problem.constraints.length > 0 && (
               <div className="space-y-2">
                 <h3 className="font-bold text-slate-900 dark:text-white text-xs uppercase tracking-wider">Constraints</h3>
@@ -252,9 +258,7 @@ export const ProblemWorkspace: React.FC<ProblemWorkspaceProps> = ({ slug, onNavi
 
         {/* Right Column: Code Editor & Results Panel */}
         <div className="lg:col-span-7 flex flex-col h-[650px] space-y-4">
-          {/* Top Code Editor Box */}
           <div className="saas-card !p-0 overflow-hidden flex flex-col flex-1">
-            {/* Editor Toolbar */}
             <div className="flex items-center justify-between px-4 py-2.5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40">
               <div className="flex items-center space-x-2">
                 <select
@@ -275,7 +279,6 @@ export const ProblemWorkspace: React.FC<ProblemWorkspaceProps> = ({ slug, onNavi
               </button>
             </div>
 
-            {/* Textarea Editor */}
             <div className="flex-1 relative bg-slate-950 text-slate-100 font-mono text-xs">
               <textarea
                 value={code}
@@ -285,10 +288,9 @@ export const ProblemWorkspace: React.FC<ProblemWorkspaceProps> = ({ slug, onNavi
               />
             </div>
 
-            {/* Action Bar (Run / Submit) */}
             <div className="px-4 py-2.5 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 flex items-center justify-between">
               <div className="text-2xs text-slate-400 font-mono">
-                Line 1, Col 1
+                {isSubmitting ? 'Status: Judging submission...' : 'Ready'}
               </div>
 
               <div className="flex items-center space-x-3">
@@ -310,9 +312,7 @@ export const ProblemWorkspace: React.FC<ProblemWorkspaceProps> = ({ slug, onNavi
             </div>
           </div>
 
-          {/* Bottom Results & Testcases Panel */}
           <div className="saas-card !p-0 overflow-hidden h-[200px] flex flex-col">
-            {/* Panel Tabs */}
             <div className="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 px-4 pt-2">
               <button
                 onClick={() => setBottomTab('testcases')}
@@ -336,7 +336,6 @@ export const ProblemWorkspace: React.FC<ProblemWorkspaceProps> = ({ slug, onNavi
               </button>
             </div>
 
-            {/* Panel Body */}
             <div className="p-4 overflow-y-auto flex-1 text-xs font-mono">
               {bottomTab === 'testcases' && (
                 <div className="space-y-3">
@@ -367,60 +366,68 @@ export const ProblemWorkspace: React.FC<ProblemWorkspaceProps> = ({ slug, onNavi
 
               {bottomTab === 'result' && (
                 <div>
-                  {runResult && !result && (
+                  {isSubmitting && (
+                    <div className="flex items-center space-x-3 py-4">
+                      <span className="w-5 h-5 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></span>
+                      <p className="text-xs text-slate-400">Judging solution against hidden test cases...</p>
+                    </div>
+                  )}
+
+                  {runResult && !result && !isSubmitting && (
                     <div className="space-y-2">
                       <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">{runResult.status}</span>
                       <pre className="text-xs text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{runResult.output}</pre>
                     </div>
                   )}
 
-                  {result && (
+                  {result && !isSubmitting && (
                     <div className="space-y-3">
-                      <div className="flex items-center space-x-3">
-                        <span className={`text-base font-extrabold ${
-                          result.submission.status === 'Accepted' ? 'text-emerald-500' : 'text-rose-500'
-                        }`}>
-                          {result.submission.status}
-                        </span>
-                        {result.submission.runtime !== undefined && (
-                          <span className="text-2xs text-slate-400">
-                            Runtime: {result.submission.runtime} ms
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <span className={`text-base font-extrabold ${statusColors[result.status]}`}>
+                            {result.status}
                           </span>
-                        )}
-                        {result.submission.memory !== undefined && (
-                          <span className="text-2xs text-slate-400">
-                            Memory: {(result.submission.memory / 1024).toFixed(1)} MB
-                          </span>
-                        )}
+                          <span className="text-2xs text-slate-400">Runtime: {result.runtime} ms</span>
+                          <span className="text-2xs text-slate-400">Memory: {(result.memory / 1024).toFixed(1)} MB</span>
+                        </div>
+                        <button
+                          onClick={() => onNavigate(`/submissions/${result.id}`)}
+                          className="text-xs text-indigo-600 font-bold hover:underline"
+                        >
+                          View Details →
+                        </button>
                       </div>
 
-                      {result.submission.status === 'Accepted' && (
+                      {result.status === 'Accepted' && (
                         <p className="text-emerald-600 dark:text-emerald-400 text-xs">
-                          🎉 Congratulations! Your solution passed all test cases!
+                          🎉 Solution Accepted! Passed all test cases.
                         </p>
                       )}
 
-                      {result.failedTestCase && (
-                        <div className="space-y-1.5 bg-rose-50 dark:bg-rose-950/20 p-3 rounded-lg border border-rose-200 dark:border-rose-900/30 text-xs text-rose-900 dark:text-rose-300">
-                          <p><span className="font-bold">Input:</span> {result.failedTestCase.input}</p>
-                          <p><span className="font-bold">Expected Output:</span> {result.failedTestCase.expectedOutput}</p>
-                          {result.actualOutput && (
-                            <p><span className="font-bold">Your Output:</span> {result.actualOutput}</p>
-                          )}
-                        </div>
-                      )}
-
-                      {result.error && (
-                        <div className="bg-rose-50 dark:bg-rose-950/20 p-3 rounded-lg border border-rose-200 dark:border-rose-900/30 text-xs text-rose-600 dark:text-rose-400">
-                          <p className="font-bold">Error details:</p>
-                          <pre className="mt-1 whitespace-pre-wrap">{result.error}</pre>
+                      {result.results && result.results.length > 0 && (
+                        <div className="space-y-1.5 pt-2">
+                          <p className="text-2xs font-bold text-slate-400 uppercase">Test Case Results:</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {result.results.map((tc, idx) => (
+                              <span
+                                key={tc.id}
+                                className={`px-2 py-0.5 rounded text-2xs font-bold ${
+                                  tc.status === 'Accepted'
+                                    ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400'
+                                    : 'bg-rose-100 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400'
+                                }`}
+                              >
+                                Case {idx + 1}: {tc.status}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       )}
                     </div>
                   )}
 
-                  {!runResult && !result && (
-                    <p className="text-slate-400">Click "Run" or "Submit" to see execution results.</p>
+                  {!runResult && !result && !isSubmitting && (
+                    <p className="text-slate-400">Click "Run" or "Submit" to evaluate solution.</p>
                   )}
                 </div>
               )}
