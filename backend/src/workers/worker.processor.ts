@@ -3,6 +3,8 @@ import { executionJobs, submissions, problems, testCases, submissionResults, sol
 import { eq, and } from 'drizzle-orm';
 import { executionEngine, TestCaseExecutionResult } from '../modules/judge/execution.engine';
 import { verdictEngine } from '../modules/judge/verdict.engine';
+import { ProgressService } from '../modules/progress/progress.service';
+import { AchievementsService } from '../modules/achievements/achievements.service';
 
 export class WorkerProcessor {
   private isProcessing = false;
@@ -133,8 +135,11 @@ export class WorkerProcessor {
         })
         .where(eq(problems.id, problem.id));
 
-      // 9. Track solved problem for user if Accepted
+      // 9. Handle user progress, streaks, XP, and achievements
       if (overall.status === 'Accepted') {
+        // Update user streak on active code submission
+        await ProgressService.updateStreak(submission.userId);
+
         const [alreadySolved] = await db
           .select()
           .from(solvedProblems)
@@ -151,7 +156,24 @@ export class WorkerProcessor {
             userId: submission.userId,
             problemId: problem.id,
           });
+          
+          // XP award for newly solved problem based on difficulty
+          let xpAward = 10;
+          if (problem.difficulty === 'Medium') xpAward = 25;
+          if (problem.difficulty === 'Hard') xpAward = 50;
+          
+          await ProgressService.addXp(submission.userId, xpAward);
+          await ProgressService.logActivity(submission.userId, 'submission_accepted', { difficulty: problem.difficulty, problemTitle: problem.title }, problem.id);
+          await AchievementsService.checkAchievements(submission.userId);
+        } else {
+          // Already solved problem: log activity and check achievements without re-granting problem XP
+          await ProgressService.logActivity(submission.userId, 'submission_accepted_repeat', { difficulty: problem.difficulty, problemTitle: problem.title }, problem.id);
+          await AchievementsService.checkAchievements(submission.userId);
         }
+      } else {
+        // Non-accepted submission: update streak and log attempt
+        await ProgressService.updateStreak(submission.userId);
+        await ProgressService.logActivity(submission.userId, 'submission_attempted', { status: overall.status, problemTitle: problem.title }, problem.id);
       }
 
       // 10. Mark job as completed

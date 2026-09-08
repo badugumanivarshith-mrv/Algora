@@ -6,6 +6,8 @@ import { users, User, NewUser } from '../../db/schema';
 import { eq } from 'drizzle-orm';
 import { env } from '../../config/env';
 import { JwtPayload } from './auth.types';
+import { ProgressService } from '../progress/progress.service';
+import { AchievementsService } from '../achievements/achievements.service';
 
 export class AuthService {
   async hashPassword(password: string): Promise<string> {
@@ -174,6 +176,15 @@ export class AuthService {
         lastLoginAt: new Date(),
       })
       .where(eq(users.id, userId));
+      
+    // Gamification hooks
+    try {
+      await ProgressService.handleLoginStreak(userId);
+      await ProgressService.logActivity(userId, 'login');
+      await AchievementsService.checkAchievements(userId);
+    } catch (error) {
+      console.error('Error processing gamification logic on login:', error);
+    }
   }
 }
 export const authService = new AuthService();

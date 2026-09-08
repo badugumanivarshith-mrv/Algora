@@ -1,5 +1,5 @@
 import { db } from './index';
-import { problems, tags, problemTags, testCases } from './schema';
+import { problems, tags, problemTags, testCases, achievements } from './schema';
 import { eq } from 'drizzle-orm';
 
 export async function seedDatabase() {
@@ -275,4 +275,86 @@ export async function seedDatabase() {
   }
 
   console.log('✅ Seed complete. 6 problems seeded successfully.');
+
+  console.log('Seeding achievements...');
+  const achievementsData = [
+    {
+      name: 'First Steps',
+      description: 'Solve your first problem',
+      icon: '🎯',
+      category: 'Starter',
+      xpReward: 50,
+    },
+    {
+      name: 'Consistent Coder (3 Day)',
+      description: 'Reach a 3-day login streak',
+      icon: '🔥',
+      category: 'Consistency',
+      xpReward: 100,
+    },
+    {
+      name: 'Dedication (7 Day)',
+      description: 'Reach a 7-day login streak',
+      icon: '📅',
+      category: 'Consistency',
+      xpReward: 300,
+    },
+    {
+      name: 'Unstoppable (30 Day)',
+      description: 'Reach a 30-day login streak',
+      icon: '⚡',
+      category: 'Consistency',
+      xpReward: 1000,
+    },
+    {
+      name: 'Problem Solver 10',
+      description: 'Solve 10 problems',
+      icon: '🏆',
+      category: 'Solver',
+      xpReward: 200,
+    },
+    {
+      name: 'Master Solver 50',
+      description: 'Solve 50 problems',
+      icon: '🌟',
+      category: 'Solver',
+      xpReward: 500,
+    },
+    {
+      name: 'Grandmaster 100',
+      description: 'Solve 100 problems',
+      icon: '👑',
+      category: 'Solver',
+      xpReward: 1000,
+    },
+    {
+      name: 'Easy Peasy',
+      description: 'Solve 5 Easy difficulty problems',
+      icon: '🟢',
+      category: 'Difficulty',
+      xpReward: 100,
+    },
+    {
+      name: 'Medium Master',
+      description: 'Solve 5 Medium difficulty problems',
+      icon: '🟡',
+      category: 'Difficulty',
+      xpReward: 250,
+    },
+    {
+      name: 'Hardcore',
+      description: 'Solve 3 Hard difficulty problems',
+      icon: '🔴',
+      category: 'Difficulty',
+      xpReward: 500,
+    }
+  ];
+
+  for (const ach of achievementsData) {
+    const [existing] = await db.select().from(achievements).where(eq(achievements.name, ach.name)).limit(1);
+    if (!existing) {
+      await db.insert(achievements).values(ach);
+    }
+  }
+  console.log('✅ Achievements seeded successfully.');
 }

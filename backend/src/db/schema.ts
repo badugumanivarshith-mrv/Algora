@@ -144,3 +144,64 @@ export const solvedProblems = pgTable('solved_problems', {
 
 export type SolvedProblem = typeof solvedProblems.$inferSelect;
 export type NewSolvedProblem = typeof solvedProblems.$inferInsert;
+
+// --- Phase 8: Gamification & Analytics Schemas ---
+
+export const userStreaks = pgTable('user_streaks', {
+  userId: integer('user_id').notNull().primaryKey().references(() => users.id, { onDelete: 'cascade' }),
+  currentStreak: integer('current_streak').default(0).notNull(),
+  longestStreak: integer('longest_streak').default(0).notNull(),
+  lastActiveDate: timestamp('last_active_date'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export type UserStreak = typeof userStreaks.$inferSelect;
+export type NewUserStreak = typeof userStreaks.$inferInsert;
+
+export const userXp = pgTable('user_xp', {
+  userId: integer('user_id').notNull().primaryKey().references(() => users.id, { onDelete: 'cascade' }),
+  totalXp: integer('total_xp').default(0).notNull(),
+  level: integer('level').default(1).notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export type UserXp = typeof userXp.$inferSelect;
+export type NewUserXp = typeof userXp.$inferInsert;
+
+export const achievements = pgTable('achievements', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 256 }).notNull(),
+  description: text('description').notNull(),
+  icon: varchar('icon', { length: 256 }).notNull(),
+  xpReward: integer('xp_reward').default(0).notNull(),
+  category: varchar('category', { length: 100 }).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export type Achievement = typeof achievements.$inferSelect;
+export type NewAchievement = typeof achievements.$inferInsert;
+
+export const userAchievements = pgTable('user_achievements', {
+  userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  achievementId: integer('achievement_id').notNull().references(() => achievements.id, { onDelete: 'cascade' }),
+  unlockedAt: timestamp('unlocked_at').defaultNow().notNull(),
+}, (table) => ({
+  pk: primaryKey({ columns: [table.userId, table.achievementId] }),
+}));
+
+export type UserAchievement = typeof userAchievements.$inferSelect;
+export type NewUserAchievement = typeof userAchievements.$inferInsert;
+
+export const userActivity = pgTable('user_activity', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  problemId: integer('problem_id').references(() => problems.id, { onDelete: 'set null' }),
+  action: varchar('action', { length: 100 }).notNull(),
+  metadata: jsonb('metadata').default('{}'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export type UserActivity = typeof userActivity.$inferSelect;
+export type NewUserActivity = typeof userActivity.$inferInsert;
+
