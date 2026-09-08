@@ -82,12 +82,21 @@ export interface LeaderboardResponse {
   };
 }
 
+export interface ActivityMetadata {
+  difficulty?: string;
+  problemTitle?: string;
+  achievementId?: number;
+  name?: string;
+  status?: string;
+  [key: string]: unknown;
+}
+
 export interface UserActivityItem {
   id: number;
   userId: number;
   problemId: number | null;
   action: string;
-  metadata: any;
+  metadata: ActivityMetadata;
   createdAt: string;
 }
 

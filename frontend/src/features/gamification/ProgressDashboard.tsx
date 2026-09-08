@@ -44,7 +44,7 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ user, onNa
         setLeaderboard(lbData.rankings);
         setTotalPages(lbData.pagination.totalPages);
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error('Failed to load dashboard data:', e);
       setError('Failed to load progress data. Please refresh or try again later.');
     } finally {

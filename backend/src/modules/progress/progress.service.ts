@@ -123,7 +123,7 @@ export class ProgressService {
     };
   }
 
-  static async logActivity(userId: number, action: string, metadata: any = {}, problemId?: number) {
+  static async logActivity(userId: number, action: string, metadata: Record<string, unknown> = {}, problemId?: number) {
     await db.insert(userActivity).values({
       userId,
       problemId,

@@ -9,6 +9,7 @@ router.get('/me', protect, async (req, res) => {
     const unlocked = await AchievementsService.getUserAchievements(req.user!.id);
     res.json({ success: true, data: unlocked });
   } catch (error) {
+    console.error('Fetch user achievements error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
@@ -18,6 +19,7 @@ router.get('/', async (req, res) => {
     const all = await AchievementsService.getAllAchievements();
     res.json({ success: true, data: all });
   } catch (error) {
+    console.error('Fetch achievements error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });

@@ -59,6 +59,7 @@ router.get('/tags', protect, async (req, res) => {
     const distribution = await AnalyticsService.getSolvedTagsDistribution(req.user!.id);
     res.json({ success: true, data: distribution });
   } catch (error) {
+    console.error('Analytics tags error:', error);
     res.status(500).json({ success: false, message: 'Failed to fetch tags distribution' });
   }
 });

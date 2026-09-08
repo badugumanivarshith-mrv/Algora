@@ -1,6 +1,6 @@
 import { db } from '../../db';
-import { users, userActivity, solvedProblems, problems, problemTags, tags, userXp, userStreaks, submissions, achievements, userAchievements } from '../../db/schema';
-import { eq, desc, gte, and, sql, ilike, or } from 'drizzle-orm';
+import { users, userActivity, solvedProblems, problems, problemTags, tags, userXp, submissions, achievements, userAchievements } from '../../db/schema';
+import { eq, desc, sql } from 'drizzle-orm';
 import { ProgressService } from '../progress/progress.service';
 
 export interface LeaderboardItem {
@@ -112,7 +112,7 @@ export class AnalyticsService {
       })
       .from(submissions);
 
-    let rankings: Omit<LeaderboardItem, 'rank'>[] = allUsers.map((u) => {
+    const rankings: Omit<LeaderboardItem, 'rank'>[] = allUsers.map((u) => {
       const uXp = allXp.find((x) => x.userId === u.id);
       const totalXp = uXp?.totalXp || 0;
       const level = uXp?.level || 1;

@@ -1,6 +1,6 @@
 import { db } from '../../db';
-import { achievements, userAchievements, userStreaks, solvedProblems, userActivity } from '../../db/schema';
-import { eq, count, and } from 'drizzle-orm';
+import { achievements, userAchievements, userStreaks, solvedProblems, problems } from '../../db/schema';
+import { eq, and } from 'drizzle-orm';
 import { ProgressService } from '../progress/progress.service';
 
 export class AchievementsService {
